@@ -1,26 +1,146 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-unbounded), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, SFMono-Regular, monospace;
+  --color-night: #060908;
+  --color-panel: #0d1311;
+  --color-neon: #2be39b;
+  --color-bone: #eef5f1;
+  --color-mute: #8fa39a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background: #060908;
+  overflow-x: clip;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: clip;
+}
+
+::selection {
+  background: #2be39b;
+  color: #060908;
+}
+
+:focus-visible {
+  outline: 3px solid #2be39b;
+  outline-offset: 3px;
+}
+
+/* ---- Outlined text ---- */
+.stroke-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(238, 245, 241, 0.5);
+}
+.stroke-neon {
+  color: transparent;
+  -webkit-text-stroke: 2px #2be39b;
+  text-shadow: 0 0 40px rgba(43, 227, 155, 0.35);
+}
+
+/* ---- Hero content stays hidden until GSAP animates it (class "js" is set in <head>) ---- */
+.js [data-hero] [data-hero-item],
+.js [data-hero] [data-words] {
+  visibility: hidden;
+}
+
+/* ---- Header ---- */
+[data-header].is-scrolled {
+  background: rgba(6, 9, 8, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* ---- Cursor spotlight on cards (position is set by lib/motion.ts) ---- */
+.spot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -30%), rgba(43, 227, 155, 0.16), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.spot:hover::after {
+  opacity: 1;
+}
+
+/* ---- Featured card: neon light running around the border ---- */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.neon-border {
+  position: relative;
+}
+.neon-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--angle), transparent 0 55%, #2be39b 80%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin-angle 5s linear infinite;
+  pointer-events: none;
+}
+@keyframes spin-angle {
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* ---- Method steps light up one at a time ---- */
+[data-step] {
+  opacity: 0.35;
+  transition: opacity 0.5s;
+}
+[data-step].is-active {
+  opacity: 1;
+}
+[data-step] .step-num {
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(238, 245, 241, 0.4);
+  transition: color 0.5s, -webkit-text-stroke-color 0.5s, text-shadow 0.5s;
+}
+[data-step].is-active .step-num {
+  color: #2be39b;
+  -webkit-text-stroke-color: #2be39b;
+  text-shadow: 0 0 50px rgba(43, 227, 155, 0.5);
+}
+
+/* ---- Lenis smooth scroll (required rules) ---- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-step] {
+    opacity: 1;
+  }
+  .neon-border::before {
+    animation: none;
+  }
 }
